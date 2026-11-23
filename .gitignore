@@ -30,3 +30,7 @@ logs/
 Thumbs.db
 .vscode/
 .idea/
+
+campus_sell_buy_backup.sql
+*.pem
+*.crt
