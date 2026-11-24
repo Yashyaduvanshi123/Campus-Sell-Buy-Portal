@@ -73,7 +73,6 @@ const ProductDetails = () => {
   const { user, isAuthenticated } = useAuth();
   const { isFavourited, toggleFavourite } = useFavourites();
   const { isInCart, addToCart } = useCart();
-  const inCart = isInCart(product?.id);
 
   const [product, setProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -145,6 +144,7 @@ const ProductDetails = () => {
   }
 
   const isFav = isFavourited(product.id);
+  const inCart = isInCart(product.id);
   const discount = calculateDiscount(product.price, product.original_price);
   const isOwner = user?.id === product.seller_id;
   const isSold = product.status === 'sold';
