@@ -284,6 +284,7 @@ const Navbar = () => {
                             src={getMediaUrl(user.profile_image)}
                             alt={user.full_name || 'Student Profile'}
                             className="w-full h-full object-cover"
+                            onError={() => setNavbarImgError(true)}
                           />
                         ) : (
                           <span>{user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'Y'}</span>

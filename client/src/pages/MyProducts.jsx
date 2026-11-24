@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Package, 
-  Edit3, 
-  Trash2, 
-  CheckCircle, 
-  RotateCcw, 
-  Eye, 
-  Heart, 
-  MessageSquare, 
-  PlusCircle, 
+import {
+  Package,
+  Edit3,
+  Trash2,
+  CheckCircle,
+  RotateCcw,
+  Eye,
+  Heart,
+  MessageSquare,
+  PlusCircle,
   ExternalLink,
   Calendar,
   ShoppingBag,
@@ -22,7 +22,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { formatPrice, formatDate } from '../utils/formatters';
+import { formatPrice, formatDate, getMediaUrl, handleImageError, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/formatters';
 import ConfirmationModal from '../components/ConfirmationModal';
 import EmptyState from '../components/EmptyState';
 import toast from 'react-hot-toast';
@@ -115,7 +115,7 @@ const MyProducts = () => {
 
   return (
     <div className="space-y-6">
-      
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E5E0D7]">
         <div>
@@ -142,13 +142,12 @@ const MyProducts = () => {
 
       {/* Quick Summary Metric Cards */}
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
-        <div 
+        <div
           onClick={() => setActiveTab('all')}
-          className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer ${
-            activeTab === 'all'
-              ? 'bg-[#292D32] text-white border-[#292D32] shadow-sm'
-              : 'bg-white text-[#292D32] border-[#E5E0D7] hover:border-[#B9A58A]'
-          }`}
+          className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer ${activeTab === 'all'
+            ? 'bg-[#292D32] text-white border-[#292D32] shadow-sm'
+            : 'bg-white text-[#292D32] border-[#E5E0D7] hover:border-[#B9A58A]'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className={`text-[11px] font-bold uppercase tracking-wider ${activeTab === 'all' ? 'text-[#B9A58A]' : 'text-[#6B7075]'}`}>
@@ -159,13 +158,12 @@ const MyProducts = () => {
           <p className="text-xl sm:text-2xl font-black mt-1">{counts.total}</p>
         </div>
 
-        <div 
+        <div
           onClick={() => setActiveTab('active')}
-          className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer ${
-            activeTab === 'active'
-              ? 'bg-[#292D32] text-white border-[#292D32] shadow-sm'
-              : 'bg-white text-[#292D32] border-[#E5E0D7] hover:border-[#B9A58A]'
-          }`}
+          className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer ${activeTab === 'active'
+            ? 'bg-[#292D32] text-white border-[#292D32] shadow-sm'
+            : 'bg-white text-[#292D32] border-[#E5E0D7] hover:border-[#B9A58A]'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className={`text-[11px] font-bold uppercase tracking-wider ${activeTab === 'active' ? 'text-[#B9A58A]' : 'text-[#6B7075]'}`}>
@@ -178,13 +176,12 @@ const MyProducts = () => {
           </p>
         </div>
 
-        <div 
+        <div
           onClick={() => setActiveTab('sold')}
-          className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer ${
-            activeTab === 'sold'
-              ? 'bg-[#292D32] text-white border-[#292D32] shadow-sm'
-              : 'bg-white text-[#292D32] border-[#E5E0D7] hover:border-[#B9A58A]'
-          }`}
+          className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer ${activeTab === 'sold'
+            ? 'bg-[#292D32] text-white border-[#292D32] shadow-sm'
+            : 'bg-white text-[#292D32] border-[#E5E0D7] hover:border-[#B9A58A]'
+            }`}
         >
           <div className="flex items-center justify-between">
             <span className={`text-[11px] font-bold uppercase tracking-wider ${activeTab === 'sold' ? 'text-[#B9A58A]' : 'text-[#6B7075]'}`}>
@@ -202,31 +199,28 @@ const MyProducts = () => {
       <div className="flex gap-2 border-b border-[#E5E0D7] pb-3">
         <button
           onClick={() => setActiveTab('all')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'all'
-              ? 'bg-[#292D32] text-white shadow-xs'
-              : 'bg-white text-[#6B7075] border border-[#E5E0D7] hover:bg-[#ECE7DE]'
-          }`}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'all'
+            ? 'bg-[#292D32] text-white shadow-xs'
+            : 'bg-white text-[#6B7075] border border-[#E5E0D7] hover:bg-[#ECE7DE]'
+            }`}
         >
           All Listings ({counts.total})
         </button>
         <button
           onClick={() => setActiveTab('active')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'active'
-              ? 'bg-[#292D32] text-white shadow-xs'
-              : 'bg-white text-[#6B7075] border border-[#E5E0D7] hover:bg-[#ECE7DE]'
-          }`}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'active'
+            ? 'bg-[#292D32] text-white shadow-xs'
+            : 'bg-white text-[#6B7075] border border-[#E5E0D7] hover:bg-[#ECE7DE]'
+            }`}
         >
           Active Listings ({counts.active})
         </button>
         <button
           onClick={() => setActiveTab('sold')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'sold'
-              ? 'bg-[#292D32] text-white shadow-xs'
-              : 'bg-white text-[#6B7075] border border-[#E5E0D7] hover:bg-[#ECE7DE]'
-          }`}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === 'sold'
+            ? 'bg-[#292D32] text-white shadow-xs'
+            : 'bg-white text-[#6B7075] border border-[#E5E0D7] hover:bg-[#ECE7DE]'
+            }`}
         >
           Sold Listings ({counts.sold})
         </button>
@@ -250,19 +244,18 @@ const MyProducts = () => {
                 key={p.id}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`bg-white rounded-3xl border border-[#E5E0D7] p-4 sm:p-5 shadow-subtle hover:shadow-card transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-                  isSold ? 'opacity-90 bg-[#FAF8F5]' : ''
-                }`}
+                className={`bg-white rounded-3xl border border-[#E5E0D7] p-4 sm:p-5 shadow-subtle hover:shadow-card transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${isSold ? 'opacity-90 bg-[#FAF8F5]' : ''
+                  }`}
               >
                 {/* Product Info Left Section */}
                 <div className="flex items-start sm:items-center gap-4 min-w-0 flex-1">
                   <div className="relative flex-shrink-0">
                     <img
-                      src={p.primary_image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80'}
+                      src={getMediaUrl(p.primary_image, DEFAULT_PRODUCT_PLACEHOLDER)}
                       alt={p.title}
-                      className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover bg-[#ECE7DE] border border-[#E5E0D7] ${
-                        isSold ? 'grayscale contrast-125' : ''
-                      }`}
+                      onError={handleImageError}
+                      className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover bg-[#ECE7DE] border border-[#E5E0D7] ${isSold ? 'grayscale contrast-125' : ''
+                        }`}
                     />
                     {isSold && (
                       <span className="absolute inset-0 bg-[#292D32]/60 rounded-2xl flex items-center justify-center text-[10px] font-black text-white uppercase tracking-wider">
@@ -353,11 +346,10 @@ const MyProducts = () => {
                   <button
                     disabled={isStatusUpdating}
                     onClick={() => handleToggleSold(p)}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 ${
-                      isSold
-                        ? 'bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-300'
-                        : 'bg-[#ECE7DE] text-[#292D32] hover:bg-[#E5E0D7] border border-[#E5E0D7]'
-                    }`}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 ${isSold
+                      ? 'bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-300'
+                      : 'bg-[#ECE7DE] text-[#292D32] hover:bg-[#E5E0D7] border border-[#E5E0D7]'
+                      }`}
                     title={isSold ? 'Re-activate product for buyers' : 'Mark as sold to hide from active browsing'}
                   >
                     {isSold ? (
@@ -414,15 +406,15 @@ const MyProducts = () => {
             activeTab === 'sold'
               ? 'No sold items yet'
               : activeTab === 'active'
-              ? 'No active listings'
-              : 'You have not listed any products yet'
+                ? 'No active listings'
+                : 'You have not listed any products yet'
           }
           description={
             activeTab === 'sold'
               ? 'When buyers purchase your items, you can mark them as sold here.'
               : activeTab === 'active'
-              ? 'You do not have any items currently active for sale. List a new item to get started!'
-              : 'Upload textbooks, calculators, lab coats, notes, or gadgets to start selling to fellow campus students.'
+                ? 'You do not have any items currently active for sale. List a new item to get started!'
+                : 'Upload textbooks, calculators, lab coats, notes, or gadgets to start selling to fellow campus students.'
           }
           actionText="List a Product"
           actionLink="/add-product"

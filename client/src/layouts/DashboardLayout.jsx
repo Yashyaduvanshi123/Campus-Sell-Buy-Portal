@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Package, 
-  PlusCircle, 
-  Heart, 
-  User, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  Package,
+  PlusCircle,
+  Heart,
+  User,
+  LogOut,
   MessageSquare,
   ChevronRight,
   ShieldCheck,
@@ -57,11 +57,11 @@ const DashboardLayout = () => {
 
       <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div className="flex flex-col md:flex-row gap-8">
-          
+
           {/* Dashboard Sidebar */}
           <aside className="w-full md:w-64 flex-shrink-0">
             <div className="bg-white rounded-3xl border border-[#E5E0D7] p-5 shadow-subtle sticky top-24">
-              
+
               {/* User Mini Profile */}
               <div className="flex items-center gap-3.5 pb-5 border-b border-[#E5E0D7]">
                 <div className="w-12 h-12 rounded-2xl bg-[#292D32] text-white font-black flex items-center justify-center text-lg shadow-sm border border-[#B9A58A]/30 overflow-hidden flex-shrink-0">
@@ -70,10 +70,17 @@ const DashboardLayout = () => {
                       src={getMediaUrl(user.profile_image)}
                       alt={user.full_name || 'Student Profile'}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        if (e.currentTarget.nextElementSibling) {
+                          e.currentTarget.nextElementSibling.style.display = 'inline';
+                        }
+                      }}
                     />
-                  ) : (
-                    <span>{user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'Y'}</span>
-                  )}
+                  ) : null}
+                  <span style={{ display: user?.profile_image ? 'none' : 'inline' }}>
+                    {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'Y'}
+                  </span>
                 </div>
                 <div className="overflow-hidden">
                   <h4 className="text-sm font-extrabold text-[#292D32] truncate">{user?.full_name}</h4>
@@ -93,10 +100,9 @@ const DashboardLayout = () => {
                     to={item.to}
                     end={item.end}
                     className={({ isActive }) =>
-                      `flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all ${
-                        isActive
-                          ? 'bg-[#292D32] text-white shadow-sm shadow-[#292D32]/25'
-                          : 'text-[#6B7075] hover:text-[#292D32] hover:bg-[#ECE7DE]'
+                      `flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all ${isActive
+                        ? 'bg-[#292D32] text-white shadow-sm shadow-[#292D32]/25'
+                        : 'text-[#6B7075] hover:text-[#292D32] hover:bg-[#ECE7DE]'
                       }`
                     }
                   >

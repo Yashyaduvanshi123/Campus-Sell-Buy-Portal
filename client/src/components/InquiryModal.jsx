@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, Send, MessageSquare, Phone, MapPin, Sparkles, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
-import { formatPrice } from '../utils/formatters';
+import { formatPrice, getMediaUrl, handleImageError, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/formatters';
 import toast from 'react-hot-toast';
 
 const InquiryModal = ({ isOpen, onClose, product, seller }) => {
@@ -95,8 +95,9 @@ const InquiryModal = ({ isOpen, onClose, product, seller }) => {
         {/* Compact Product Header */}
         <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border border-[#E5E0D7] flex items-center gap-3 mb-5">
           <img
-            src={product.primary_image || product.images?.[0]?.image_url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80'}
+            src={getMediaUrl(product.primary_image || product.images?.[0]?.image_url, DEFAULT_PRODUCT_PLACEHOLDER)}
             alt={product.title}
+            onError={handleImageError}
             className="w-12 h-12 rounded-xl object-cover bg-[#ECE7DE] flex-shrink-0"
           />
           <div className="overflow-hidden">

@@ -18,7 +18,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { formatPrice } from '../utils/formatters';
+import { formatPrice, getMediaUrl, handleImageError, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/formatters';
 
 const Cart = () => {
   const { cart, removeFromCart, clearCart, checkoutInquiry, summary, fetchCart, loading } = useCart();
@@ -178,8 +178,9 @@ const Cart = () => {
                       className="relative w-full sm:w-32 h-32 sm:h-32 rounded-2xl overflow-hidden bg-[#ECE7DE] flex-shrink-0 block"
                     >
                       <img
-                        src={item.primary_image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&auto=format&fit=crop&q=80'}
+                        src={getMediaUrl(item.primary_image, DEFAULT_PRODUCT_PLACEHOLDER)}
                         alt={item.title}
+                        onError={handleImageError}
                         className={`w-full h-full object-cover object-center ${!isItemAvailable ? 'grayscale' : ''}`}
                       />
                       {!isItemAvailable && (

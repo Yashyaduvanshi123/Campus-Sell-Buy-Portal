@@ -23,6 +23,39 @@ const getInitials = (name) => {
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 };
 
+const ChatAvatar = ({
+  image,
+  name,
+  size = 'w-10 h-10',
+  textClass = 'text-xs',
+  borderClass = 'border-[#E5E0D7]'
+}) => {
+  const [hasError, setHasError] = useState(false);
+  const mediaUrl = getMediaUrl(image);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [image]);
+
+  return (
+    <div
+      className={`${size} rounded-full overflow-hidden bg-[#292D32] text-white font-extrabold flex items-center justify-center ${textClass} shadow-xs border ${borderClass} flex-shrink-0 select-none`}
+      title={name || 'User'}
+    >
+      {mediaUrl && !hasError ? (
+        <img
+          src={mediaUrl}
+          alt={name || 'User'}
+          className="w-full h-full object-cover"
+          onError={() => setHasError(true)}
+        />
+      ) : (
+        <span>{getInitials(name)}</span>
+      )}
+    </div>
+  );
+};
+
 const fallbackInquiryDetail = {
   id: 1,
   product_id: 1,
@@ -314,13 +347,13 @@ const InquiryDetails = () => {
             </h3>
 
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full overflow-hidden bg-[#292D32] text-white font-bold flex items-center justify-center text-sm shadow-xs border border-[#B9A58A]/30 flex-shrink-0">
-                {peerImage ? (
-                  <img src={peerImage} alt={peerName} className="w-full h-full object-cover" />
-                ) : (
-                  <span>{getInitials(peerName)}</span>
-                )}
-              </div>
+              <ChatAvatar
+                image={peerImage}
+                name={peerName}
+                size="w-11 h-11"
+                textClass="text-sm"
+                borderClass="border-[#B9A58A]/30"
+              />
               <div className="min-w-0">
                 <h4 className="text-sm font-black text-[#292D32] truncate">{peerName}</h4>
                 <p className="text-xs text-[#6B7075] truncate flex items-center gap-1 mt-0.5">
@@ -350,17 +383,13 @@ const InquiryDetails = () => {
           <div className="px-5 sm:px-6 py-4 border-b border-[#E5E0D7] bg-[#FAF8F5]/80 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
               {/* Circular Avatar */}
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden bg-[#292D32] text-white font-extrabold flex items-center justify-center text-xs sm:text-sm shadow-xs border border-[#E5E0D7] flex-shrink-0">
-                {peerImage ? (
-                  <img
-                    src={peerImage}
-                    alt={peerName}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span>{getInitials(peerName)}</span>
-                )}
-              </div>
+              <ChatAvatar
+                image={peerImage}
+                name={peerName}
+                size="w-10 h-10 sm:w-11 sm:h-11"
+                textClass="text-xs sm:text-sm"
+                borderClass="border-[#E5E0D7]"
+              />
 
               {/* Name & Role/Campus */}
               <div className="min-w-0">
@@ -393,9 +422,10 @@ const InquiryDetails = () => {
           <div ref={messagesContainerRef} className="flex-1 p-4 sm:p-6 overflow-y-auto max-h-[460px] space-y-4">
             {messages.map((msg) => {
               const isMine = msg.sender_id === user?.id;
-              const senderAvatar = isMine ? (user?.profile_image || null) : (msg.sender_profile_image || peerImage || null);
+              const senderAvatar = isMine
+                ? (user?.profile_image || msg.sender_profile_image || null)
+                : (msg.sender_profile_image || peerImage || null);
               const senderDisplayName = isMine ? 'You' : (msg.sender_name || peerName);
-              const senderInitials = getInitials(isMine ? (user?.full_name || 'You') : senderDisplayName);
 
               return (
                 <div
@@ -403,22 +433,13 @@ const InquiryDetails = () => {
                   className={`flex items-end gap-2 sm:gap-2.5 ${isMine ? 'flex-row-reverse' : 'flex-row'}`}
                 >
                   {/* Sender Circular Avatar */}
-                  <div
-                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex-shrink-0 overflow-hidden border border-[#E5E0D7] shadow-2xs flex items-center justify-center bg-[#292D32] text-white"
-                    title={senderDisplayName}
-                  >
-                    {senderAvatar ? (
-                      <img
-                        src={senderAvatar}
-                        alt={senderDisplayName}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-[10px] sm:text-xs font-bold">
-                        {senderInitials}
-                      </span>
-                    )}
-                  </div>
+                  <ChatAvatar
+                    image={senderAvatar}
+                    name={isMine ? (user?.full_name || 'You') : senderDisplayName}
+                    size="w-7 h-7 sm:w-8 sm:h-8"
+                    textClass="text-[10px] sm:text-xs"
+                    borderClass="border-[#E5E0D7]"
+                  />
 
                   {/* Message Bubble & Metadata */}
                   <div className={`max-w-[80%] sm:max-w-[72%] flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>

@@ -4,6 +4,7 @@ import { Upload, X, ArrowLeft, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { getMediaUrl, handleImageError, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/formatters';
 import toast from 'react-hot-toast';
 
 const fallbackCategories = [
@@ -212,7 +213,12 @@ const EditProduct = () => {
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 pt-2">
             {existingImages.map((img, idx) => (
               <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border border-[#E5E0D7] shadow-xs">
-                <img src={img.image_url} alt="product" className="w-full h-full object-cover" />
+                <img
+                  src={getMediaUrl(img.image_url, DEFAULT_PRODUCT_PLACEHOLDER)}
+                  alt="product"
+                  onError={handleImageError}
+                  className="w-full h-full object-cover"
+                />
                 {idx === 0 && (
                   <span className="absolute bottom-2 left-2 bg-[#292D32]/85 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
                     Cover

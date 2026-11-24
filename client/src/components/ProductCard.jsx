@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, MapPin, Sparkles, CheckCircle2, ShoppingCart, Check, Edit3 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { formatPrice, calculateDiscount, formatDate } from '../utils/formatters';
+import { formatPrice, calculateDiscount, formatDate, getMediaUrl, handleImageError, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/formatters';
 import { useFavourites } from '../context/FavouriteContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -55,8 +55,9 @@ const ProductCard = ({ product }) => {
       {/* Image Container */}
       <Link to={`/products/${product.id}`} className="relative aspect-[4/3] w-full overflow-hidden bg-[#ECE7DE] block">
         <img
-          src={product.primary_image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80'}
+          src={getMediaUrl(product.primary_image, DEFAULT_PRODUCT_PLACEHOLDER)}
           alt={product.title}
+          onError={handleImageError}
           className={`w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-700 ease-out ${
             isSold ? 'grayscale contrast-125' : ''
           }`}

@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  MessageSquare, 
-  Phone, 
-  Mail, 
-  Clock, 
-  CheckCircle, 
-  ArrowUpRight, 
-  User, 
-  ArrowRight, 
-  ShieldCheck, 
+import {
+  MessageSquare,
+  Phone,
+  Mail,
+  Clock,
+  CheckCircle,
+  ArrowUpRight,
+  User,
+  ArrowRight,
+  ShieldCheck,
   CheckCheck,
   Package
 } from 'lucide-react';
@@ -103,7 +103,7 @@ const Inquiries = () => {
 
   return (
     <div className="space-y-6">
-      
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E5E0D7]">
         <div>
@@ -123,16 +123,14 @@ const Inquiries = () => {
       <div className="flex gap-2">
         <button
           onClick={() => setActiveTab('received')}
-          className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-            activeTab === 'received'
-              ? 'bg-[#292D32] text-white shadow-xs'
-              : 'bg-white text-[#6B7075] border border-[#E5E0D7] hover:bg-[#ECE7DE]'
-          }`}
+          className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${activeTab === 'received'
+            ? 'bg-[#292D32] text-white shadow-xs'
+            : 'bg-white text-[#6B7075] border border-[#E5E0D7] hover:bg-[#ECE7DE]'
+            }`}
         >
           <span>Received Inquiries (As Seller)</span>
-          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-            activeTab === 'received' ? 'bg-[#1F2226] text-white' : 'bg-[#ECE7DE] text-[#292D32]'
-          }`}>
+          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${activeTab === 'received' ? 'bg-[#1F2226] text-white' : 'bg-[#ECE7DE] text-[#292D32]'
+            }`}>
             {inquiries.received.length}
           </span>
           {unreadCount > 0 && (
@@ -142,16 +140,14 @@ const Inquiries = () => {
 
         <button
           onClick={() => setActiveTab('sent')}
-          className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-            activeTab === 'sent'
-              ? 'bg-[#292D32] text-white shadow-xs'
-              : 'bg-white text-[#6B7075] border border-[#E5E0D7] hover:bg-[#ECE7DE]'
-          }`}
+          className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${activeTab === 'sent'
+            ? 'bg-[#292D32] text-white shadow-xs'
+            : 'bg-white text-[#6B7075] border border-[#E5E0D7] hover:bg-[#ECE7DE]'
+            }`}
         >
           <span>Sent Inquiries (As Buyer)</span>
-          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-            activeTab === 'sent' ? 'bg-[#1F2226] text-white' : 'bg-[#ECE7DE] text-[#292D32]'
-          }`}>
+          <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${activeTab === 'sent' ? 'bg-[#1F2226] text-white' : 'bg-[#ECE7DE] text-[#292D32]'
+            }`}>
             {inquiries.sent.length}
           </span>
         </button>
@@ -167,9 +163,9 @@ const Inquiries = () => {
       ) : currentList.length > 0 ? (
         <div className="space-y-4">
           {currentList.map((inq) => {
-            const peer = activeTab === 'received' 
-              ? { name: inq.buyer_name, campus: inq.buyer_campus, phone: inq.phone || inq.buyer_registered_phone }
-              : { name: inq.seller_name, campus: inq.seller_campus, phone: inq.seller_phone };
+            const peer = activeTab === 'received'
+              ? { name: inq.buyer_name, campus: inq.buyer_campus, phone: inq.phone || inq.buyer_registered_phone, profile_image: inq.buyer_profile_image }
+              : { name: inq.seller_name, campus: inq.seller_campus, phone: inq.seller_phone, profile_image: inq.seller_profile_image };
 
             const isUnread = activeTab === 'received' && inq.status === 'pending';
 
@@ -178,11 +174,10 @@ const Inquiries = () => {
                 key={inq.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`bg-white rounded-3xl border transition-all p-5 space-y-4 ${
-                  isUnread
-                    ? 'border-[#B9A58A] ring-2 ring-[#B9A58A]/20 shadow-sm'
-                    : 'border-[#E5E0D7] shadow-subtle hover:shadow-card'
-                }`}
+                className={`bg-white rounded-3xl border transition-all p-5 space-y-4 ${isUnread
+                  ? 'border-[#B9A58A] ring-2 ring-[#B9A58A]/20 shadow-sm'
+                  : 'border-[#E5E0D7] shadow-subtle hover:shadow-card'
+                  }`}
               >
                 {/* Header: Product Preview & Date */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E5E0D7]">
@@ -203,7 +198,7 @@ const Inquiries = () => {
                         />
                       ) : null;
                     })()}
-                    <div 
+                    <div
                       className="w-12 h-12 rounded-xl bg-[#ECE7DE] border border-[#E5E0D7] items-center justify-center flex-shrink-0 text-[#8A7B68]"
                       style={{ display: (inq.product_image || inq.primary_image) ? 'none' : 'flex' }}
                     >
@@ -220,13 +215,12 @@ const Inquiries = () => {
                   </div>
 
                   <div className="flex items-center gap-2 self-start sm:self-center">
-                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
-                      inq.status === 'pending'
-                        ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                        : inq.status === 'contacted'
+                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${inq.status === 'pending'
+                      ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                      : inq.status === 'contacted'
                         ? 'bg-[#ECE7DE] text-[#292D32] border border-[#E5E0D7]'
                         : 'bg-[#ECE7DE] text-[#292D32] border border-[#E5E0D7]'
-                    }`}>
+                      }`}>
                       {inq.status}
                     </span>
                     <span className="text-[11px] text-[#6B7075] font-medium">
@@ -239,8 +233,23 @@ const Inquiries = () => {
                 <div className="flex flex-col sm:flex-row justify-between gap-4">
                   <div className="space-y-1.5 flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-[#ECE7DE] text-[#292D32] font-bold flex items-center justify-center text-[10px] border border-[#E5E0D7]">
-                        {peer.name ? peer.name.charAt(0) : 'U'}
+                      <div className="w-6 h-6 rounded-full overflow-hidden bg-[#292D32] text-white font-bold flex items-center justify-center text-[10px] border border-[#E5E0D7] flex-shrink-0">
+                        {peer.profile_image ? (
+                          <img
+                            src={getMediaUrl(peer.profile_image)}
+                            alt={peer.name || 'User'}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              if (e.currentTarget.nextElementSibling) {
+                                e.currentTarget.nextElementSibling.style.display = 'inline';
+                              }
+                            }}
+                          />
+                        ) : null}
+                        <span style={{ display: peer.profile_image ? 'none' : 'inline' }}>
+                          {peer.name ? peer.name.charAt(0).toUpperCase() : 'U'}
+                        </span>
                       </div>
                       <span className="text-xs font-bold text-[#292D32]">{peer.name}</span>
                       <span className="text-[11px] text-[#6B7075]">({peer.campus || 'Campus'})</span>

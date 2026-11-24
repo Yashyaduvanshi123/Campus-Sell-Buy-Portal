@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../services/api';
-import { formatPrice, calculateDiscount, formatDate } from '../utils/formatters';
+import { formatPrice, calculateDiscount, formatDate, getMediaUrl, handleImageError, DEFAULT_PRODUCT_PLACEHOLDER } from '../utils/formatters';
 import { useAuth } from '../context/AuthContext';
 import { useFavourites } from '../context/FavouriteContext';
 import { useCart } from '../context/CartContext';
@@ -214,8 +214,9 @@ const ProductDetails = () => {
         <div className="lg:col-span-7 space-y-4">
           <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-white border border-[#E5E0D7] shadow-subtle">
             <img
-              src={imagesList[selectedImage]?.image_url}
+              src={getMediaUrl(imagesList[selectedImage]?.image_url, DEFAULT_PRODUCT_PLACEHOLDER)}
               alt={product.title}
+              onError={handleImageError}
               className={`w-full h-full object-cover object-center ${isSold ? 'grayscale' : ''}`}
             />
 
@@ -249,7 +250,12 @@ const ProductDetails = () => {
                       : 'border-[#E5E0D7] opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+                  <img
+                    src={getMediaUrl(img.image_url, DEFAULT_PRODUCT_PLACEHOLDER)}
+                    alt=""
+                    onError={handleImageError}
+                    className="w-full h-full object-cover"
+                  />
                 </button>
               ))}
             </div>
