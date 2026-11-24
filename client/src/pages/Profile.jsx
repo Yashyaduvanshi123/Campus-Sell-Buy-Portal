@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Phone, Mail, Building, Key, ShieldCheck, Camera, Lock, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { getMediaUrl } from '../utils/formatters';
 import toast from 'react-hot-toast';
 
 const Profile = () => {
@@ -13,8 +14,20 @@ const Profile = () => {
   const [phone, setPhone] = useState(user?.phone || '');
   const [campus, setCampus] = useState(user?.campus || 'North Campus Hostel 4');
   const [profileImage, setProfileImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(user?.profile_image || null);
+  const [imagePreview, setImagePreview] = useState(user?.profile_image ? getMediaUrl(user.profile_image) : null);
   const [updatingProfile, setUpdatingProfile] = useState(false);
+
+  // Sync state if user loads or updates
+  useEffect(() => {
+    if (user) {
+      setFullName(user.full_name || '');
+      setPhone(user.phone || '');
+      setCampus(user.campus || '');
+      if (!profileImage) {
+        setImagePreview(user.profile_image ? getMediaUrl(user.profile_image) : null);
+      }
+    }
+  }, [user]);
 
   // Password fields
   const [currentPassword, setCurrentPassword] = useState('');
@@ -55,16 +68,16 @@ const Profile = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      if (res.data.success) {
+      if (res.data?.success && res.data.user) {
         updateUser(res.data.user);
+        setProfileImage(null);
+        setImagePreview(res.data.user.profile_image ? getMediaUrl(res.data.user.profile_image) : null);
         toast.success('Profile details updated!');
       } else {
-        updateUser({ ...user, full_name: fullName, phone, campus });
-        toast.success('Profile details saved!');
+        toast.error(res.data?.message || 'Failed to update profile.');
       }
     } catch (err) {
-      updateUser({ ...user, full_name: fullName, phone, campus });
-      toast.success('Profile details saved!');
+      toast.error(err.response?.data?.message || 'Failed to update profile.');
     } finally {
       setUpdatingProfile(false);
     }
@@ -132,7 +145,7 @@ const Profile = () => {
                 {imagePreview ? (
                   <img src={imagePreview} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'
+                  user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'Y'
                 )}
               </div>
               <label className="absolute -bottom-1 -right-1 p-2 bg-[#292D32] hover:bg-[#1F2226] text-white rounded-xl shadow-md cursor-pointer transition-colors border border-[#B9A58A]/40">

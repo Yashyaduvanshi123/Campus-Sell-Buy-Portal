@@ -92,10 +92,12 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, async () => {
-  console.log(`🚀 Campus Sell & Buy Server running on http://localhost:${PORT}`);
-  console.log(`⚙️  Environment: ${process.env.NODE_ENV || 'development'}`);
-  await testConnection();
-});
+if (require.main === module) {
+  app.listen(PORT, async () => {
+    console.log(`🚀 Campus Sell & Buy Server running on http://localhost:${PORT}`);
+    console.log(`⚙️  Environment: ${process.env.NODE_ENV || 'development'}`);
+    await testConnection();
+  });
+}
 
 module.exports = app;

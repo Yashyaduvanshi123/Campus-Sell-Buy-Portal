@@ -494,6 +494,17 @@ const updateProductStatus = async (req, res, next) => {
 // @route   GET /api/products/my/listings
 const getMyProducts = async (req, res, next) => {
   try {
+    const { status } = req.query;
+    let whereSQL = 'WHERE p.seller_id = ?';
+    const params = [req.user.id];
+
+    if (status && ['active', 'sold'].includes(status)) {
+      whereSQL += ' AND p.status = ?';
+      params.push(status);
+    } else {
+      whereSQL += " AND p.status != 'removed'";
+    }
+
     const query = `
       SELECT 
         p.*,
@@ -503,15 +514,31 @@ const getMyProducts = async (req, res, next) => {
         (SELECT COUNT(*) FROM inquiries WHERE product_id = p.id) AS inquiries_count
       FROM products p
       JOIN categories c ON p.category_id = c.id
-      WHERE p.seller_id = ?
+      ${whereSQL}
       ORDER BY p.created_at DESC
     `;
 
-    const [products] = await pool.query(query, [req.user.id]);
+    const [products] = await pool.query(query, params);
+
+    // Fetch live counts for user
+    const [counts] = await pool.query(
+      `SELECT 
+        COUNT(*) AS total_count,
+        SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) AS active_count,
+        SUM(CASE WHEN status = 'sold' THEN 1 ELSE 0 END) AS sold_count
+       FROM products 
+       WHERE seller_id = ? AND status != 'removed'`,
+      [req.user.id]
+    );
 
     res.json({
       success: true,
-      data: products
+      data: products,
+      counts: {
+        total: parseInt(counts[0]?.total_count || 0, 10),
+        active: parseInt(counts[0]?.active_count || 0, 10),
+        sold: parseInt(counts[0]?.sold_count || 0, 10)
+      }
     });
   } catch (error) {
     next(error);

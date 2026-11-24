@@ -24,6 +24,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useFavourites } from '../context/FavouriteContext';
 import { useCart } from '../context/CartContext';
+import { getMediaUrl } from '../utils/formatters';
 import api from '../services/api';
 
 const Navbar = () => {
@@ -34,6 +35,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [unreadInquiries, setUnreadInquiries] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const [navbarImgError, setNavbarImgError] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,6 +43,11 @@ const Navbar = () => {
   const isHome = location.pathname === '/';
   // Transparent only when on the homepage and not scrolled down
   const isTransparent = isHome && !scrolled;
+
+  // Reset image error when user's profile photo updates
+  useEffect(() => {
+    setNavbarImgError(false);
+  }, [user?.profile_image]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -246,7 +253,16 @@ const Navbar = () => {
                   ? 'bg-[#292D32] text-white border border-white/30'
                   : 'bg-[#292D32] text-white border border-[#B9A58A]/30'
                   }`}>
-                  {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'A'}
+                  {user?.profile_image && !navbarImgError ? (
+                    <img
+                      src={getMediaUrl(user.profile_image)}
+                      alt={user.full_name || 'Student Profile'}
+                      className="w-full h-full object-cover"
+                      onError={() => setNavbarImgError(true)}
+                    />
+                  ) : (
+                    <span>{user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'Y'}</span>
+                  )}
                 </div>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 flex-shrink-0 ${isTransparent ? 'text-white/90 drop-shadow-sm' : 'text-[#6B7075]'
                   } ${dropdownOpen ? 'rotate-180' : ''}`} />
@@ -261,14 +277,27 @@ const Navbar = () => {
                     transition={{ duration: 0.15 }}
                     className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl border border-[#E5E0D7] py-2 z-50 overflow-hidden text-[#292D32]"
                   >
-                    <div className="px-4 py-3 bg-[#FAF8F5] border-b border-[#E5E0D7]">
-                      <p className="text-xs font-bold text-[#292D32] truncate">{user?.full_name}</p>
-                      <p className="text-[11px] text-[#6B7075] truncate">{user?.email}</p>
-                      <div className="mt-1.5 flex items-center gap-1.5">
-                        <span className="inline-block w-2 h-2 rounded-full bg-[#B9A58A]"></span>
-                        <span className="text-[10px] font-bold text-[#292D32] uppercase tracking-wide">
-                          {user?.campus || 'Campus Student'}
-                        </span>
+                    <div className="px-4 py-3 bg-[#FAF8F5] border-b border-[#E5E0D7] flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#292D32] text-white font-bold flex items-center justify-center text-xs shadow-xs flex-shrink-0 overflow-hidden border border-[#B9A58A]/30">
+                        {user?.profile_image && !navbarImgError ? (
+                          <img
+                            src={getMediaUrl(user.profile_image)}
+                            alt={user.full_name || 'Student Profile'}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span>{user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'Y'}</span>
+                        )}
+                      </div>
+                      <div className="overflow-hidden min-w-0 flex-1">
+                        <p className="text-xs font-bold text-[#292D32] truncate">{user?.full_name}</p>
+                        <p className="text-[11px] text-[#6B7075] truncate">{user?.email}</p>
+                        <div className="mt-1 flex items-center gap-1.5">
+                          <span className="inline-block w-2 h-2 rounded-full bg-[#B9A58A]"></span>
+                          <span className="text-[10px] font-bold text-[#292D32] uppercase tracking-wide truncate">
+                            {user?.campus || 'Campus Student'}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
@@ -285,7 +314,7 @@ const Navbar = () => {
                         className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-[#292D32] hover:bg-[#ECE7DE] hover:text-[#292D32] transition-colors"
                       >
                         <Package className="w-4 h-4 text-[#6B7075]" />
-                        <span>My Listed Products</span>
+                        <span>My Listings</span>
                       </Link>
                       <Link
                         to="/favourites"

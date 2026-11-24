@@ -132,6 +132,7 @@ function App() {
             >
               <Route index element={<Dashboard />} />
               <Route path="my-products" element={<MyProducts />} />
+              <Route path="my-listings" element={<MyProducts />} />
               <Route path="inquiries" element={<Inquiries />} />
               <Route path="inquiries/:id" element={<InquiryDetails />} />
             </Route>

@@ -85,6 +85,7 @@ const getMyInquiries = async (req, res, next) => {
         p.title AS product_title, p.price AS product_price, p.status AS product_status,
         p.allow_whatsapp,
         (SELECT image_url FROM product_images WHERE product_id = p.id ORDER BY is_primary DESC, id ASC LIMIT 1) AS product_image,
+        (SELECT image_url FROM product_images WHERE product_id = p.id ORDER BY is_primary DESC, id ASC LIMIT 1) AS primary_image,
         b.full_name AS buyer_name, b.email AS buyer_email, b.phone AS buyer_registered_phone, b.campus AS buyer_campus, b.profile_image AS buyer_profile_image,
         (SELECT COUNT(*) FROM inquiry_messages WHERE inquiry_id = i.id) AS messages_count,
         (SELECT message FROM inquiry_messages WHERE inquiry_id = i.id ORDER BY created_at DESC LIMIT 1) AS latest_message,
@@ -103,6 +104,7 @@ const getMyInquiries = async (req, res, next) => {
         p.title AS product_title, p.price AS product_price, p.status AS product_status,
         p.allow_whatsapp,
         (SELECT image_url FROM product_images WHERE product_id = p.id ORDER BY is_primary DESC, id ASC LIMIT 1) AS product_image,
+        (SELECT image_url FROM product_images WHERE product_id = p.id ORDER BY is_primary DESC, id ASC LIMIT 1) AS primary_image,
         s.full_name AS seller_name, s.email AS seller_email, s.phone AS seller_phone, s.campus AS seller_campus, s.profile_image AS seller_profile_image,
         (SELECT COUNT(*) FROM inquiry_messages WHERE inquiry_id = i.id) AS messages_count,
         (SELECT message FROM inquiry_messages WHERE inquiry_id = i.id ORDER BY created_at DESC LIMIT 1) AS latest_message,
@@ -143,6 +145,7 @@ const getInquiryById = async (req, res, next) => {
         p.original_price AS product_original_price, p.product_condition, p.campus AS product_campus,
         p.status AS product_status, p.allow_whatsapp,
         (SELECT image_url FROM product_images WHERE product_id = p.id ORDER BY is_primary DESC, id ASC LIMIT 1) AS product_image,
+        (SELECT image_url FROM product_images WHERE product_id = p.id ORDER BY is_primary DESC, id ASC LIMIT 1) AS primary_image,
         b.id AS buyer_id, b.full_name AS buyer_name, b.email AS buyer_email, b.phone AS buyer_phone, b.campus AS buyer_campus, b.profile_image AS buyer_profile_image,
         s.id AS seller_id, s.full_name AS seller_name, s.email AS seller_email, s.phone AS seller_phone, s.campus AS seller_campus, s.profile_image AS seller_profile_image
       FROM inquiries i

@@ -222,6 +222,15 @@ const checkoutInquiry = async (req, res, next) => {
       });
     }
 
+    // Prevent purchasing own product
+    const ownItem = cartProducts.find((p) => p.seller_id === req.user.id);
+    if (ownItem) {
+      return res.status(400).json({
+        success: false,
+        message: `You cannot purchase your own listed product: "${ownItem.title}".`
+      });
+    }
+
     await conn.beginTransaction();
 
     const contactedInquiries = [];

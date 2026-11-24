@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Upload, X, ArrowLeft, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 const fallbackCategories = [
@@ -19,6 +20,7 @@ const fallbackCategories = [
 const EditProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
@@ -56,6 +58,14 @@ const EditProduct = () => {
 
         if (prodRes.data?.success && prodRes.data.data) {
           const p = prodRes.data.data;
+
+          // Authorization guard: Student can only edit their own listing
+          if (user && p.seller_id && user.id !== p.seller_id) {
+            toast.error('Unauthorized. You can only edit your own listings.');
+            navigate('/dashboard/my-products');
+            return;
+          }
+
           setFormData({
             title: p.title || '',
             category_id: p.category_id || '',
@@ -69,17 +79,9 @@ const EditProduct = () => {
           });
           setExistingImages(p.images || []);
         } else {
-          setFormData({
-            title: 'Casio FX-991EX Classwiz Scientific Calculator',
-            category_id: 1,
-            price: 850,
-            original_price: 1595,
-            product_condition: 'Like New',
-            campus: 'North Campus Hostel 4',
-            description: 'Used for 2 semesters in Engineering. Excellent working condition with solar panel and battery.',
-            allow_whatsapp: true,
-            status: 'active'
-          });
+          toast.error('Listing not found or unavailable.');
+          navigate('/dashboard/my-products');
+          return;
         }
       } catch (err) {
         toast.error('Failed to load listing for editing.');
@@ -153,16 +155,14 @@ const EditProduct = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      if (res.data.success) {
+      if (res.data?.success) {
         toast.success('Listing updated successfully!');
         navigate(`/products/${id}`);
       } else {
-        toast.success('Changes saved successfully!');
-        navigate(`/products/${id}`);
+        toast.error(res.data?.message || 'Failed to update listing.');
       }
     } catch (err) {
-      toast.success('Changes saved successfully!');
-      navigate(`/products/${id}`);
+      toast.error(err.response?.data?.message || 'Failed to update listing.');
     } finally {
       setSubmitting(false);
     }

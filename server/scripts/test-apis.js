@@ -56,23 +56,28 @@ function request(options, data) {
       }
     });
 
+    let sampleProductId = 1;
+    let sampleTitle = 'HP';
+
     // 3. Products Browse & Filter
     await test('Products GET /api/products', async () => {
       const res = await request({ port: 5001, path: '/api/products?limit=5', method: 'GET' });
       if (res.status !== 200 || !res.body.success || res.body.data.length === 0) {
         throw new Error('Products browse failed');
       }
+      sampleProductId = res.body.data[0].id;
+      sampleTitle = res.body.data[0].title.split(' ')[0];
     });
 
     // 4. Products Search
-    await test('Products Search GET /api/products?search=Calculator', async () => {
-      const res = await request({ port: 5001, path: '/api/products?search=Calculator', method: 'GET' });
+    await test('Products Search GET /api/products?search=' + sampleTitle, async () => {
+      const res = await request({ port: 5001, path: `/api/products?search=${encodeURIComponent(sampleTitle)}`, method: 'GET' });
       if (res.status !== 200 || res.body.data.length === 0) throw new Error('Search failed');
     });
 
     // 5. Product Details
-    await test('Product Details GET /api/products/1', async () => {
-      const res = await request({ port: 5001, path: '/api/products/1', method: 'GET' });
+    await test('Product Details GET /api/products/' + sampleProductId, async () => {
+      const res = await request({ port: 5001, path: `/api/products/${sampleProductId}`, method: 'GET' });
       if (res.status !== 200 || !res.body.data.title || !res.body.data.images) {
         throw new Error('Product details failed');
       }
@@ -127,10 +132,18 @@ function request(options, data) {
     });
 
     // 12. Toggle Favourite
-    await test('Add/Remove Favourite POST /api/favourites/2', async () => {
+    await test(`Add/Remove Favourite POST /api/favourites/${sampleProductId}`, async () => {
+      // Cleanup first in case it was already favourited
+      await request({
+        port: 5001,
+        path: `/api/favourites/${sampleProductId}`,
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${studentToken}` }
+      });
+
       const addRes = await request({
         port: 5001,
-        path: '/api/favourites/2',
+        path: `/api/favourites/${sampleProductId}`,
         method: 'POST',
         headers: { Authorization: `Bearer ${studentToken}` }
       });
@@ -138,7 +151,7 @@ function request(options, data) {
 
       const delRes = await request({
         port: 5001,
-        path: '/api/favourites/2',
+        path: `/api/favourites/${sampleProductId}`,
         method: 'DELETE',
         headers: { Authorization: `Bearer ${studentToken}` }
       });
@@ -155,6 +168,13 @@ function request(options, data) {
       });
       if (res.status !== 200 || !res.body.data.received || !res.body.data.sent) {
         throw new Error('Inquiries fetch failed');
+      }
+      const allInquiries = [...res.body.data.received, ...res.body.data.sent];
+      if (allInquiries.length > 0) {
+        const item = allInquiries[0];
+        if (item.product_image === undefined || item.primary_image === undefined) {
+          throw new Error('Expected product_image and primary_image to be defined on inquiry object');
+        }
       }
     });
 
@@ -283,6 +303,71 @@ function request(options, data) {
       });
       if (res.status !== 201 || !res.body.productId) throw new Error('Create product failed');
       createdProductId = res.body.productId;
+    });
+
+    // 15b. My Listings Endpoint & Owner Scoping
+    await test('My Listings GET /api/products/my/listings', async () => {
+      const res = await request({
+        port: 5001,
+        path: '/api/products/my/listings',
+        method: 'GET',
+        headers: { Authorization: `Bearer ${studentToken}` }
+      });
+      if (res.status !== 200 || !res.body.success || !Array.isArray(res.body.data)) {
+        throw new Error('Failed to fetch user listings');
+      }
+      if (!res.body.counts || res.body.counts.total === undefined) {
+        throw new Error('Expected counts object with total, active, and sold in response');
+      }
+      const myProduct = res.body.data.find(p => p.id === createdProductId);
+      if (!myProduct) {
+        throw new Error('Created product not found in user listings');
+      }
+      // Ensure all listings belong to the authenticated student
+      const foreignProduct = res.body.data.find(p => p.seller_id !== myProduct.seller_id);
+      if (foreignProduct) {
+        throw new Error('Found product not belonging to authenticated student in My Listings');
+      }
+    });
+
+    // 15c. Prevent Seller from Adding Own Product to Cart
+    await test('Prevent Add Own Product to Cart POST /api/cart/:id', async () => {
+      const res = await request({
+        port: 5001,
+        path: `/api/cart/${createdProductId}`,
+        method: 'POST',
+        headers: { Authorization: `Bearer ${studentToken}` }
+      });
+      if (res.status !== 400 || !res.body.message.includes('own')) {
+        throw new Error(`Expected 400 error preventing adding own product, got ${res.status}: ${JSON.stringify(res.body)}`);
+      }
+    });
+
+    // 15d. Unauthorized Student Cannot Edit Another Student's Listing
+    await test('Unauthorized Student Edit Blocked PUT /api/products/:id', async () => {
+      // Login as Rohan (different student)
+      const rohanLogin = await request({
+        port: 5001,
+        path: '/api/auth/login',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }, { email: 'rohan.verma@campusmarket.edu', password: 'Student123!' });
+
+      const rohanToken = rohanLogin.body.token;
+
+      const editRes = await request({
+        port: 5001,
+        path: `/api/products/${createdProductId}`,
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${rohanToken}`,
+          'Content-Type': 'application/json'
+        }
+      }, { title: 'Hacked Title By Rohan' });
+
+      if (editRes.status !== 403) {
+        throw new Error(`Expected 403 Forbidden on unauthorized edit, got ${editRes.status}`);
+      }
     });
 
     // 16. Mark Product as Sold

@@ -15,6 +15,7 @@ import {
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
+import { getMediaUrl } from '../utils/formatters';
 import api from '../services/api';
 
 const DashboardLayout = () => {
@@ -38,7 +39,7 @@ const DashboardLayout = () => {
 
   const navItems = [
     { name: 'Overview', to: '/dashboard', icon: LayoutDashboard, end: true },
-    { name: 'My Products', to: '/dashboard/my-products', icon: Package },
+    { name: 'My Listings', to: '/dashboard/my-products', icon: Package },
     { name: 'Add Product', to: '/add-product', icon: PlusCircle },
     { name: 'Buyer Inquiries', to: '/dashboard/inquiries', icon: MessageSquare, badge: unreadInquiries },
     { name: 'Saved Wishlist', to: '/favourites', icon: Heart },
@@ -63,8 +64,16 @@ const DashboardLayout = () => {
               
               {/* User Mini Profile */}
               <div className="flex items-center gap-3.5 pb-5 border-b border-[#E5E0D7]">
-                <div className="w-12 h-12 rounded-2xl bg-[#292D32] text-white font-black flex items-center justify-center text-lg shadow-sm border border-[#B9A58A]/30">
-                  {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'S'}
+                <div className="w-12 h-12 rounded-2xl bg-[#292D32] text-white font-black flex items-center justify-center text-lg shadow-sm border border-[#B9A58A]/30 overflow-hidden flex-shrink-0">
+                  {user?.profile_image ? (
+                    <img
+                      src={getMediaUrl(user.profile_image)}
+                      alt={user.full_name || 'Student Profile'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>{user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'Y'}</span>
+                  )}
                 </div>
                 <div className="overflow-hidden">
                   <h4 className="text-sm font-extrabold text-[#292D32] truncate">{user?.full_name}</h4>

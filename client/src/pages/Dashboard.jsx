@@ -71,11 +71,11 @@ const Dashboard = () => {
         if (listingsRes.data?.success && listingsRes.data.data) {
           setMyListings(listingsRes.data.data);
         } else {
-          setMyListings(fallbackRecentListings);
+          setMyListings([]);
         }
       } catch (err) {
         setProfileData({ stats: fallbackStats });
-        setMyListings(fallbackRecentListings);
+        setMyListings([]);
       } finally {
         setLoading(false);
       }

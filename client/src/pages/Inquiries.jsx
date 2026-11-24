@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../services/api';
-import { formatPrice, formatDate } from '../utils/formatters';
+import { formatPrice, formatDate, getMediaUrl } from '../utils/formatters';
 import EmptyState from '../components/EmptyState';
 import toast from 'react-hot-toast';
 
@@ -187,11 +187,28 @@ const Inquiries = () => {
                 {/* Header: Product Preview & Date */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E5E0D7]">
                   <div className="flex items-center gap-3 min-w-0">
-                    <img
-                      src={inq.primary_image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80'}
-                      alt=""
-                      className="w-12 h-12 rounded-xl object-cover bg-[#ECE7DE] flex-shrink-0"
-                    />
+                    {(() => {
+                      const imgUrl = getMediaUrl(inq.product_image || inq.primary_image);
+                      return imgUrl ? (
+                        <img
+                          src={imgUrl}
+                          alt={inq.product_title || 'Product'}
+                          className="w-12 h-12 rounded-xl object-cover bg-[#ECE7DE] flex-shrink-0 border border-[#E5E0D7]"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            if (e.currentTarget.nextElementSibling) {
+                              e.currentTarget.nextElementSibling.style.display = 'flex';
+                            }
+                          }}
+                        />
+                      ) : null;
+                    })()}
+                    <div 
+                      className="w-12 h-12 rounded-xl bg-[#ECE7DE] border border-[#E5E0D7] items-center justify-center flex-shrink-0 text-[#8A7B68]"
+                      style={{ display: (inq.product_image || inq.primary_image) ? 'none' : 'flex' }}
+                    >
+                      <Package className="w-6 h-6 text-[#8A7B68]" />
+                    </div>
                     <div className="min-w-0">
                       <Link to={`/products/${inq.product_id}`} className="font-extrabold text-sm text-[#292D32] hover:text-[#B9A58A] truncate block transition-colors">
                         {inq.product_title}

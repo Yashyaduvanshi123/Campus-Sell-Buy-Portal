@@ -50,3 +50,29 @@ export const formatItemCount = (count) => {
   }
   return '50+ items';
 };
+
+/**
+ * Resolves media/image URLs for both local development and production.
+ * - Leaves absolute URLs (http, https, blob, data) untouched (e.g. Cloudinary).
+ * - Resolves relative paths (e.g. /uploads/...) using the backend API origin when configured.
+ */
+export const getMediaUrl = (url) => {
+  if (!url) return null;
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('blob:') ||
+    url.startsWith('data:')
+  ) {
+    return url;
+  }
+
+  const apiUrl = import.meta.env.VITE_API_URL || '';
+  if (apiUrl) {
+    // If apiUrl is https://.../api, strip the trailing /api segment
+    const baseOrigin = apiUrl.replace(/\/api\/?$/, '');
+    return `${baseOrigin}${url.startsWith('/') ? '' : '/'}${url}`;
+  }
+
+  return url;
+};

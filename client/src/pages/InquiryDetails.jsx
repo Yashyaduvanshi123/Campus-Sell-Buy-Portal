@@ -7,12 +7,13 @@ import {
   Phone, 
   MapPin, 
   ExternalLink,
-  Sparkles
+  Sparkles,
+  Package
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { formatPrice, formatDate } from '../utils/formatters';
+import { formatPrice, formatDate, getMediaUrl } from '../utils/formatters';
 import toast from 'react-hot-toast';
 
 const getInitials = (name) => {
@@ -260,11 +261,28 @@ const InquiryDetails = () => {
             <h3 className="text-xs font-bold uppercase tracking-wider text-[#6B7075]">Listing Details</h3>
             
             <div className="flex gap-3">
-              <img
-                src={inquiry.product_image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80'}
-                alt={inquiry.product_title}
-                className="w-16 h-16 rounded-2xl object-cover bg-[#ECE7DE] flex-shrink-0"
-              />
+              {(() => {
+                const imgUrl = getMediaUrl(inquiry.product_image || inquiry.primary_image);
+                return imgUrl ? (
+                  <img
+                    src={imgUrl}
+                    alt={inquiry.product_title || 'Product'}
+                    className="w-16 h-16 rounded-2xl object-cover bg-[#ECE7DE] flex-shrink-0 border border-[#E5E0D7]"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      if (e.currentTarget.nextElementSibling) {
+                        e.currentTarget.nextElementSibling.style.display = 'flex';
+                      }
+                    }}
+                  />
+                ) : null;
+              })()}
+              <div
+                className="w-16 h-16 rounded-2xl bg-[#ECE7DE] border border-[#E5E0D7] items-center justify-center flex-shrink-0 text-[#8A7B68]"
+                style={{ display: (inquiry.product_image || inquiry.primary_image) ? 'none' : 'flex' }}
+              >
+                <Package className="w-8 h-8 text-[#8A7B68]" />
+              </div>
               <div className="min-w-0 flex-1">
                 <Link
                   to={`/products/${inquiry.product_id}`}

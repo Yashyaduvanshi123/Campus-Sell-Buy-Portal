@@ -1,17 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, MapPin, Sparkles, CheckCircle2, ShoppingCart, Check } from 'lucide-react';
+import { Heart, MapPin, Sparkles, CheckCircle2, ShoppingCart, Check, Edit3 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatPrice, calculateDiscount, formatDate } from '../utils/formatters';
 import { useFavourites } from '../context/FavouriteContext';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const ProductCard = ({ product }) => {
+  const { user } = useAuth();
   const { isFavourited, toggleFavourite } = useFavourites();
   const { isInCart, addToCart } = useCart();
   const fav = isFavourited(product.id);
   const inCart = isInCart(product.id);
   const discount = calculateDiscount(product.price, product.original_price);
+  const isOwner = !!(user && product.seller_id && user.id === product.seller_id);
 
   const getConditionStyle = (cond) => {
     switch (cond) {
@@ -141,9 +144,18 @@ const ProductCard = ({ product }) => {
           </span>
         </div>
 
-        {/* Add to Cart Button */}
+        {/* Add to Cart or Owner Manage Button */}
         <div className="mt-3">
-          {isSold ? (
+          {isOwner ? (
+            <Link
+              to={`/edit-product/${product.id}`}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full py-2.5 px-3 rounded-xl bg-[#ECE7DE] hover:bg-[#E5E0D7] text-[#292D32] text-xs font-bold flex items-center justify-center gap-1.5 border border-[#E5E0D7] transition-all cursor-pointer"
+            >
+              <Edit3 className="w-3.5 h-3.5 text-[#B9A58A]" />
+              <span>Manage Your Listing</span>
+            </Link>
+          ) : isSold ? (
             <button
               disabled
               className="w-full py-2.5 px-3 rounded-xl bg-[#ECE7DE] text-[#6B7075] text-xs font-semibold cursor-not-allowed border border-[#E5E0D7]"

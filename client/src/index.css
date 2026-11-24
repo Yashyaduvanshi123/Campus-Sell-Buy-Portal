@@ -87,3 +87,23 @@ header::after {
   content: none !important;
   display: none !important;
 }
+
+/* Seamless Infinite Product Marquee */
+@keyframes marquee-scroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(calc(-100% - 20px), 0, 0);
+  }
+}
+
+.animate-marquee-track {
+  animation: marquee-scroll var(--marquee-duration, 35s) linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-track:hover,
+.marquee-container:hover .animate-marquee-track {
+  animation-play-state: paused;
+}

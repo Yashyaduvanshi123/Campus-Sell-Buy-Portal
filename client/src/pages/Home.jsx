@@ -18,6 +18,7 @@ import {
 import { motion, useReducedMotion } from 'framer-motion';
 import api from '../services/api';
 import ProductCard from '../components/ProductCard';
+import FeaturedCarousel from '../components/FeaturedCarousel';
 import { formatItemCount } from '../utils/formatters';
 
 // 6 Photographic categories matching Figma reference
@@ -61,7 +62,7 @@ const categoryCards = [
   }
 ];
 
-// 5 Featured products matching Figma Screenshot 4
+// 8 Featured products for rich carousel demonstration
 const fallbackFeatured = [
   {
     id: 101,
@@ -116,6 +117,39 @@ const fallbackFeatured = [
     campus: 'South campus',
     category_name: 'ACCESSORIES',
     primary_image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&auto=format&fit=crop&q=80',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 106,
+    title: 'Yonex Nanoray Badminton Racket',
+    price: 1100,
+    original_price: 2400,
+    product_condition: 'Like new',
+    campus: 'Sports Complex',
+    category_name: 'SPORTS',
+    primary_image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800&auto=format&fit=crop&q=80',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 107,
+    title: 'Logitech Wireless Keyboard & Mouse',
+    price: 1400,
+    original_price: 2895,
+    product_condition: 'Like new',
+    campus: 'Hostel 4 Wing B',
+    category_name: 'ELECTRONICS',
+    primary_image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&auto=format&fit=crop&q=80',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 108,
+    title: 'Engineering Lab Apron & Safety Goggles',
+    price: 350,
+    original_price: 750,
+    product_condition: 'Good',
+    campus: 'Chemistry Quad',
+    category_name: 'NOTES',
+    primary_image: 'https://images.unsplash.com/photo-1517842645767-c639042777db?w=800&auto=format&fit=crop&q=80',
     created_at: new Date().toISOString()
   }
 ];
@@ -183,7 +217,7 @@ const Home = () => {
         setLoading(true);
         const [catRes, featRes, recRes] = await Promise.all([
           api.get('/categories').catch(() => ({ data: { success: false } })),
-          api.get('/products?limit=5&sortBy=popular').catch(() => ({ data: { success: false } })),
+          api.get('/products?limit=12&sortBy=popular').catch(() => ({ data: { success: false } })),
           api.get('/products?limit=4&sortBy=newest').catch(() => ({ data: { success: false } }))
         ]);
 
@@ -191,8 +225,8 @@ const Home = () => {
           setCategories(catRes.data.data);
         }
 
-        if (featRes.data?.success && featRes.data.data?.length >= 3) {
-          setFeaturedProducts(featRes.data.data.slice(0, 5));
+        if (featRes.data?.success && featRes.data.data?.length > 0) {
+          setFeaturedProducts(featRes.data.data);
         }
 
         if (recRes.data?.success && recRes.data.data?.length > 0) {
@@ -615,7 +649,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* 4. Featured Listings: "Featured listings" - Matches Screenshot 4 */}
+        {/* 4. Featured Listings: "Featured listings" - Horizontal Auto-sliding Carousel */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
             <div>
@@ -638,12 +672,8 @@ const Home = () => {
             </Link>
           </div>
 
-          {/* 5 Cards in a row matching Figma */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
-            {featuredProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          {/* Automatic Sliding Carousel */}
+          <FeaturedCarousel products={featuredProducts} />
         </section>
 
         {/* 5. Campus Trust Banner: "People nearby. Deals that feel right." - Matches Screenshot 4 */}
