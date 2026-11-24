@@ -15,7 +15,7 @@ import {
   Users,
   Sparkles
 } from 'lucide-react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import api from '../services/api';
 import ProductCard from '../components/ProductCard';
 import FeaturedCarousel from '../components/FeaturedCarousel';
@@ -203,7 +203,6 @@ const fallbackRecent = [
 ];
 
 const Home = () => {
-  const shouldReduceMotion = useReducedMotion();
   const [searchTerm, setSearchTerm] = useState('');
   const [featuredProducts, setFeaturedProducts] = useState(fallbackFeatured);
   const [recentProducts, setRecentProducts] = useState(fallbackRecent);
@@ -295,14 +294,14 @@ const Home = () => {
 
         {/* Hero Content Container */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-20 sm:pb-28 lg:pb-36 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="max-w-2xl lg:max-w-3xl">
 
-            {/* Left Column: Heading, Search & Actions */}
+            {/* Left-Aligned Hero Content: Heading, Search & Actions */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="lg:col-span-7 xl:col-span-6 space-y-6"
+              className="space-y-6 text-left"
             >
               {/* Main Headline - Matches Screenshot 1 */}
               <h1 className="text-3xl sm:text-5xl lg:text-[54px] font-black text-white tracking-tight leading-[1.12]">
@@ -388,121 +387,6 @@ const Home = () => {
               </div>
 
             </motion.div>
-
-            {/* Right Column: Floating Product Cards - Subtle vertical floating animation & static tilts */}
-            <div className="lg:col-span-5 xl:col-span-6 relative h-[380px] sm:h-[440px] lg:h-[480px] pointer-events-none sm:pointer-events-auto">
-              {/* Floating Card 1: Semester Textbooks (-4deg static tilt, reduced ~18%, shifted down ~40px and right ~50px) */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: 1,
-                  y: shouldReduceMotion ? 0 : [0, -12, 0]
-                }}
-                transition={{
-                  opacity: { duration: 0.5 },
-                  y: shouldReduceMotion
-                    ? { duration: 0 }
-                    : {
-                      duration: 5.0,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                      delay: 0
-                    }
-                }}
-                className="absolute top-16 left-8 sm:left-14 lg:left-20 z-10"
-              >
-                <div
-                  className="bg-white/95 backdrop-blur-md p-2.5 rounded-2xl shadow-xl border border-white/80 flex flex-col gap-2 cursor-pointer w-36 sm:w-40 lg:w-[165px] transition-shadow hover:shadow-2xl"
-                  style={{ transform: 'rotate(-4deg)', willChange: 'transform' }}
-                  onClick={() => navigate('/browse?category=books')}
-                >
-                  <div className="h-24 w-full rounded-xl bg-[#292D32] text-white flex flex-col items-center justify-center p-2.5 relative overflow-hidden shadow-inner">
-                    <div className="text-xl mb-1">📖</div>
-                    <div className="text-[9px] font-bold text-center text-white/90">milk and honey</div>
-                    <div className="text-[7px] text-white/60">rupi kaur</div>
-                  </div>
-                  <div className="flex items-center justify-between pt-0.5">
-                    <h4 className="text-[11px] font-bold text-[#292D32] truncate">Semester textbooks</h4>
-                    <p className="text-xs font-black text-[#292D32]">₹1,500</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Floating Card 2: HP Pavilion Laptop (3deg static tilt, reduced ~18%, shifted down ~45px and right) */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: 1,
-                  y: shouldReduceMotion ? 0 : [0, -13, 0]
-                }}
-                transition={{
-                  opacity: { duration: 0.5 },
-                  y: shouldReduceMotion
-                    ? { duration: 0 }
-                    : {
-                      duration: 5.6,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                      delay: 1.4
-                    }
-                }}
-                className="absolute top-48 right-0 sm:right-2 lg:right-4 z-10"
-              >
-                <div
-                  className="bg-white/95 backdrop-blur-md p-2.5 rounded-2xl shadow-xl border border-white/80 flex flex-col gap-2 cursor-pointer w-40 sm:w-48 lg:w-[190px] transition-shadow hover:shadow-2xl"
-                  style={{ transform: 'rotate(3deg)', willChange: 'transform' }}
-                  onClick={() => navigate('/browse?search=laptop')}
-                >
-                  <div className="h-20 sm:h-22 w-full rounded-xl bg-[#ECE7DE] flex items-center justify-center relative overflow-hidden">
-                    <img
-                      src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&auto=format&fit=crop&q=80"
-                      alt="HP Pavilion Laptop"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between pt-0.5">
-                    <h4 className="text-[11px] font-bold text-[#292D32]">HP Pavilion</h4>
-                    <p className="text-xs font-black text-[#292D32]">₹28,000</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Floating Card 3: Sony Headphones with Yellow Card (-3deg static tilt, reduced ~18%, shifted down ~40px and right ~55px) */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: 1,
-                  y: shouldReduceMotion ? 0 : [0, -11, 0]
-                }}
-                transition={{
-                  opacity: { duration: 0.5 },
-                  y: shouldReduceMotion
-                    ? { duration: 0 }
-                    : {
-                      duration: 4.8,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                      delay: 2.6
-                    }
-                }}
-                className="absolute bottom-2 sm:bottom-4 lg:bottom-5 left-12 sm:left-20 lg:left-28 z-10"
-              >
-                <div
-                  className="bg-white/95 backdrop-blur-md p-2.5 rounded-2xl shadow-xl border border-white/80 flex flex-col gap-2 cursor-pointer w-36 sm:w-44 lg:w-[175px] transition-shadow hover:shadow-2xl"
-                  style={{ transform: 'rotate(-3deg)', willChange: 'transform' }}
-                  onClick={() => navigate('/browse?search=headphones')}
-                >
-                  <div className="h-20 w-full rounded-xl bg-[#F4B41A] flex items-center justify-center p-2 relative overflow-hidden">
-                    <span className="text-3xl filter drop-shadow-md">🎧</span>
-                  </div>
-                  <div className="flex items-center justify-between pt-0.5">
-                    <h4 className="text-[11px] font-bold text-[#292D32]">Sony headphones</h4>
-                    <p className="text-xs font-black text-[#292D32]">₹9,500</p>
-                  </div>
-                </div>
-              </motion.div>
-
-            </div>
 
           </div>
         </div>
